@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="35998a2e-7538-43a7-9ab3-33ac703d056b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/Assignment4.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/Assignment4.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/controllers/learningmodel/Agent.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/controllers/learningmodel/Agent.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/controllers/learningmodel/QPolicy.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/controllers/learningmodel/QPolicy.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/controllers/learningmodel/RLDataExtractor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/controllers/learningmodel/RLDataExtractor.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Assignment4.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Assignment4.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controllers/learningmodel/Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/learningmodel/Agent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controllers/learningmodel/QPolicy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/learningmodel/QPolicy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controllers/learningmodel/RLDataExtractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/learningmodel/RLDataExtractor.java" afterDir="false" />

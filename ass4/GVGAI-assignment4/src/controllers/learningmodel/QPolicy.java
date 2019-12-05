@@ -6,7 +6,6 @@
 package controllers.learningmodel;
 
 import weka.classifiers.Classifier;
-import weka.classifiers.trees.REPTree;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -18,7 +17,8 @@ import java.util.Random;
  * @author yuy
  */
 public class QPolicy {
-    protected double m_epsilon=0.3;
+    protected double m_epsilon=0.1;
+    protected double final_epsilon = 0.01;
     protected Classifier m_c;
     protected Instances m_dataset;
     protected Random m_rnd;
@@ -62,6 +62,8 @@ public class QPolicy {
     
     // max Q action with epsilon-greedy 
     public int getAction(double[] feature) throws Exception{
+        if(m_epsilon > final_epsilon)
+            m_epsilon -= (m_epsilon-final_epsilon)/100000;
         double[] Q = getQArray(feature);
         
         // find best action according to Q value
@@ -118,15 +120,15 @@ public class QPolicy {
     
     public void fitQ(Instances data) throws Exception{
         if( m_c == null ){
-            m_c = new weka.classifiers.trees.REPTree();
+           /* m_c = new weka.classifiers.trees.REPTree();
             ((REPTree)m_c).setMinNum(1);
-            ((REPTree)m_c).setNoPruning(true);
+            ((REPTree)m_c).setNoPruning(true);*/
             /*m_c = new weka.classifiers.trees.RandomForest();
             ((RandomForest)m_c).setMaxDepth(100);
             ((RandomForest)m_c).setNumTrees(5);
             ((RandomForest)m_c).setNumFeatures(432);
             ((RandomForest)m_c).setSeed(3);*/
-            //m_c = new weka.classifiers.trees.DecisionStump();
+            m_c = new weka.classifiers.trees.DecisionStump();
         }
         m_c.buildClassifier(data);   
     }

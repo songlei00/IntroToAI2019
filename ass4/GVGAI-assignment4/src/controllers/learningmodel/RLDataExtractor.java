@@ -74,7 +74,7 @@ public class RLDataExtractor {
         if( obs.getMovablePositions()!=null )
             for(ArrayList<Observation> l : obs.getMovablePositions()) allobj.addAll(l);
         if( obs.getPortalsPositions()!=null)
-            for(ArrayList<Observation> l : obs.getPortalsPositions()) allobj.addAll(l); // only one object
+            for(ArrayList<Observation> l : obs.getPortalsPositions()) allobj.addAll(l);
 
         Vector2d pos = obs.getAvatarPosition();
         pos.x /= 28;
@@ -94,23 +94,19 @@ public class RLDataExtractor {
                 Manhattan = Math.abs(x-pos.x) + Math.abs(y-pos.y);
         }
 
-        for(int y=0; y<15; y++)
-            for(int x=0; x<28; x++)
+        for(int x=0; x<28; x++)
+            for(int y=0; y<15; y++)
                 feature[y*28+x] = map[x][y];
 
         feature[420] = pos.x;
         feature[421] = pos.y;
         feature[422] = isTopBlock ? 1 : 0;
         feature[423] = isDangerous ? 1 : 0;
-        feature[424] = -1*Manhattan; // Max???
+        feature[424] = -1*Manhattan;
         feature[425] = obs.getGameScore();
         feature[426] = obs.getGameTick();
         feature[427] = obs.getAvatarHealthPoints();
         feature[428] = obs.getAvatarType();
-        //System.out.printf("pos_x: %f, pos_y: %f\n", pos.x, pos.y);
-        //System.out.printf("%d, %d\n", isTopBlock ? 1 : 0, isDangerous ? 1 : 0);
-        //System.out.printf("%f\n", Manhattan);
-
 
         return feature;
     }

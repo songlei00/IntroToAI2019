@@ -17,13 +17,13 @@ public class Agent extends AbstractPlayer {
 
     protected Classifier m_model;
     protected Random m_rnd;
-    private static int SIMULATION_DEPTH = 20;
+    private static int SIMULATION_DEPTH = 1000;
     private final HashMap<Integer, Types.ACTIONS> action_mapping;
     protected QPolicy m_policy;
     protected int N_ACTIONS;
     protected static Instances m_dataset;
-    protected int m_maxPoolSize = 1000;
-    protected double m_gamma = 0.99;
+    protected int m_maxPoolSize = 2000;
+    protected double m_gamma = 0.9;
 
     public Agent(StateObservation stateObs, ElapsedCpuTimer elapsedTimer) {
         m_rnd = new Random();
@@ -70,12 +70,12 @@ public class Agent extends AbstractPlayer {
     double Evaluate(double[] feature) {
         //System.out.println(feature.length);
         double score = 0;
-        //score += (13-feature[421])*5000; // y
-        //score += (feature[422] == 1) ? -5000 : 100; // isTopBlock
+        score += (13-feature[421]); // y
+        score += (feature[422] == 1) ? -5 : 100; // isTopBlock
         //score += (feature[423] == 1) ? -200 : 200; // Dangerous
-        score += 1000 * feature[424]; // Manhattan
+        score += feature[424]; // Manhattan
         //score += 10 * feature[425]; // Score
-        //score -= feature[427] * 200; // getAvatarHealthPoints
+        score -= feature[427] * 200; // getAvatarHealthPoints
 
         return score;
     }
@@ -95,15 +95,15 @@ public class Agent extends AbstractPlayer {
 
                 int action_num = policy.getAction(features);
 
-                double score_before = heuristic.evaluateState(stateObs);
-                //double score_before = Evaluate(features);
+                //double score_before = heuristic.evaluateState(stateObs);
+                double score_before = Evaluate(features);
 
                 // simulate
                 Types.ACTIONS action = action_mapping.get(action_num);
                 stateObs.advance(action);
 
-                double score_after = heuristic.evaluateState(stateObs);
-                //double score_after = Evaluate(features);
+                //double score_after = heuristic.evaluateState(stateObs);
+                double score_after = Evaluate(features);
 
                 double delta_score = factor * (score_after - score_before);
                 factor = factor * m_gamma;
