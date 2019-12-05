@@ -5,14 +5,14 @@
  */
 package controllers.learningmodel;
 
-import core.game.StateObservation;
-import java.util.HashMap;
-import java.util.Random;
-import ontology.Types;
 import weka.classifiers.Classifier;
 import weka.classifiers.trees.REPTree;
 import weka.core.Instance;
 import weka.core.Instances;
+
+import java.util.Random;
+
+//import weka.classifiers.trees.REPTree;
 /**
  *
  * @author yuy
@@ -121,6 +121,12 @@ public class QPolicy {
             m_c = new weka.classifiers.trees.REPTree();
             ((REPTree)m_c).setMinNum(1);
             ((REPTree)m_c).setNoPruning(true);
+            /*m_c = new weka.classifiers.trees.RandomForest();
+            ((RandomForest)m_c).setMaxDepth(100);
+            ((RandomForest)m_c).setNumTrees(5);
+            ((RandomForest)m_c).setNumFeatures(432);
+            ((RandomForest)m_c).setSeed(3);*/
+            //m_c = new weka.classifiers.trees.DecisionStump();
         }
         m_c.buildClassifier(data);   
     }

@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="35998a2e-7538-43a7-9ab3-33ac703d056b" name="Default Changelist" comment="" />
+    <list default="true" id="35998a2e-7538-43a7-9ab3-33ac703d056b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/Assignment4.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/Assignment4.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/controllers/learningmodel/Agent.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/controllers/learningmodel/Agent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/controllers/learningmodel/QPolicy.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/controllers/learningmodel/QPolicy.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/controllers/learningmodel/RLDataExtractor.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/controllers/learningmodel/RLDataExtractor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Assignment4.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Assignment4.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/learningmodel/Agent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/learningmodel/Agent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/learningmodel/QPolicy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/learningmodel/QPolicy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controllers/learningmodel/RLDataExtractor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/controllers/learningmodel/RLDataExtractor.java" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -11,12 +22,17 @@
   <component name="CodeInsightWorkspaceSettings">
     <option name="optimizeImportsOnTheFly" value="true" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
   <component name="ProjectId" id="1TuhSwRIELLwSGPavB7pwCU2QQp" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="Downloaded.Files.Path.Enabled" value="false" />
     <property name="Repository.Attach.Annotations" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -35,7 +51,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.HumanPlay">
+  <component name="RunManager" selected="Application.Assignment4">
     <configuration name="Assignment4 (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Assignment4" />
       <method v="2">
@@ -58,8 +74,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.HumanPlay" />
         <item itemvalue="Application.Assignment4" />
+        <item itemvalue="Application.HumanPlay" />
         <item itemvalue="Application.Assignment4 (1)" />
       </list>
     </recent_temporary>
@@ -76,5 +92,18 @@
       <updated>1574315890400</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

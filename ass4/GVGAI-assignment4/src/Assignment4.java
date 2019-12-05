@@ -29,8 +29,8 @@ public class Assignment4
         //Game and level to play
         
         // Monte-Carlo RL training
-        //CompetitionParameters.ACTION_TIME = 1000000;
-        CompetitionParameters.ACTION_TIME = 1000;
+        CompetitionParameters.ACTION_TIME = 1000000;
+        //CompetitionParameters.ACTION_TIME = 1000;
         //ArcadeMachine.runOneGame(game, level, visuals, rlController, null, seed, false);
         //String level2 = gamesPath + games[gameIdx] + "_lvl" + 1 +".txt";
         for(int i=0; i<1; i++){

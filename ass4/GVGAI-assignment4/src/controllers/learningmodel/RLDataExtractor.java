@@ -26,9 +26,10 @@ public class RLDataExtractor {
     public static Instances s_datasetHeader = datasetHeader();
     
     public RLDataExtractor(String filename) throws Exception{
-        
+
         filewriter = new FileWriter(filename+".arff");
         filewriter.write(s_datasetHeader.toString());
+
         /*
                 // ARFF File header
         filewriter.write("@RELATION AliensData\n");
@@ -50,44 +51,67 @@ public class RLDataExtractor {
     }
     
     public static Instance makeInstance(double[] features, int action, double reward){
-        features[872] = action;
-        features[873] = reward;
+        features[430] = action;
+        features[431] = reward;
         Instance ins = new Instance(1, features);
         ins.setDataset(s_datasetHeader);
         return ins;
     }
     
     public static double[] featureExtract(StateObservation obs){
-        
-        double[] feature = new double[874];  // 868 + 4 + 1(action) + 1(Q)
-        
-        // 448 locations
-        int[][] map = new int[28][31];
+
+        double[] feature = new double[432];  // 420 + 4 + 1(action) + 1(Q) 432
+        boolean isTopBlock = false;
+        boolean isDangerous = false;
+        double Manhattan = 0;
+
+        // 420 locations
+        int[][] map = new int[28][15];
         // Extract features
         LinkedList<Observation> allobj = new LinkedList<>();
         if( obs.getImmovablePositions()!=null )
             for(ArrayList<Observation> l : obs.getImmovablePositions()) allobj.addAll(l);
         if( obs.getMovablePositions()!=null )
             for(ArrayList<Observation> l : obs.getMovablePositions()) allobj.addAll(l);
-        if( obs.getNPCPositions()!=null )
-            for(ArrayList<Observation> l : obs.getNPCPositions()) allobj.addAll(l);
-        
+        if( obs.getPortalsPositions()!=null)
+            for(ArrayList<Observation> l : obs.getPortalsPositions()) allobj.addAll(l); // only one object
+
+        Vector2d pos = obs.getAvatarPosition();
+        pos.x /= 28;
+        pos.y /= 28;
+
         for(Observation o : allobj){
             Vector2d p = o.position;
-            int x = (int)(p.x/28); //squre size is 20 for pacman
+            int x = (int)(p.x/28);
             int y= (int)(p.y/28);
             map[x][y] = o.itype;
+            if(o.itype == 13 && x == pos.x && y-pos.y>=-3 && y-pos.y <=-1)
+                isTopBlock = true;
+            else if( (o.itype == 7 || o.itype == 8 || o.itype == 10 || o.itype == 11) &&
+                    Math.abs(x - pos.x) < 4 && y-pos.y>=-2 && y-pos.y <=0 )
+                isDangerous = true;
+            else if(o.itype == 4)
+                Manhattan = Math.abs(x-pos.x) + Math.abs(y-pos.y);
         }
-        for(int y=0; y<31; y++)
+
+        for(int y=0; y<15; y++)
             for(int x=0; x<28; x++)
                 feature[y*28+x] = map[x][y];
-        
-        // 4 states
-        feature[868] = obs.getGameTick();
-        feature[869] = obs.getAvatarSpeed();
-        feature[870] = obs.getAvatarHealthPoints();
-        feature[871] = obs.getAvatarType();
-        
+
+        feature[420] = pos.x;
+        feature[421] = pos.y;
+        feature[422] = isTopBlock ? 1 : 0;
+        feature[423] = isDangerous ? 1 : 0;
+        feature[424] = -1*Manhattan; // Max???
+        feature[425] = obs.getGameScore();
+        feature[426] = obs.getGameTick();
+        feature[427] = obs.getAvatarHealthPoints();
+        feature[428] = obs.getAvatarType();
+        //System.out.printf("pos_x: %f, pos_y: %f\n", pos.x, pos.y);
+        //System.out.printf("%d, %d\n", isTopBlock ? 1 : 0, isDangerous ? 1 : 0);
+        //System.out.printf("%f\n", Manhattan);
+
+
         return feature;
     }
     
@@ -97,15 +121,20 @@ public class RLDataExtractor {
             return s_datasetHeader;
         
         FastVector attInfo = new FastVector();
-        // 448 locations
-        for(int y=0; y<28; y++){
-            for(int x=0; x<31; x++){
+        // 420 locations
+        for(int y=0; y<15; y++){
+            for(int x=0; x<28; x++){
                 Attribute att = new Attribute("object_at_position_x=" + x + "_y=" + y);
                 attInfo.addElement(att);
             }
         }
-        Attribute att = new Attribute("GameTick" ); attInfo.addElement(att);
-        att = new Attribute("AvatarSpeed" ); attInfo.addElement(att);
+        Attribute att = new Attribute("Pos_x" ); attInfo.addElement(att);
+        att = new Attribute("Pos_y" ); attInfo.addElement(att);
+        att = new Attribute("isTopBlock" ); attInfo.addElement(att);
+        att = new Attribute("isDangerous" ); attInfo.addElement(att);
+        att = new Attribute("Manhattan" ); attInfo.addElement(att);
+        att = new Attribute("GameScore" ); attInfo.addElement(att);
+        att = new Attribute("GameTick" ); attInfo.addElement(att);
         att = new Attribute("AvatarHealthPoints" ); attInfo.addElement(att);
         att = new Attribute("AvatarType" ); attInfo.addElement(att);
         //action

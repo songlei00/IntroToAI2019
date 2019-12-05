@@ -1,21 +1,17 @@
 package controllers.learningmodel;
 
-import controllers.Heuristics.SimpleStateHeuristic;
 import controllers.Heuristics.StateHeuristic;
 import controllers.Heuristics.WinScoreHeuristic;
 import core.game.StateObservation;
 import core.player.AbstractPlayer;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.concurrent.TimeoutException;
 import ontology.Types;
 import tools.ElapsedCpuTimer;
-import tools.Utils;
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 import weka.core.Instances;
+
+import java.util.HashMap;
+import java.util.Random;
 
 public class Agent extends AbstractPlayer {
 
@@ -71,6 +67,19 @@ public class Agent extends AbstractPlayer {
         return bestAction;
     }
 
+    double Evaluate(double[] feature) {
+        //System.out.println(feature.length);
+        double score = 0;
+        //score += (13-feature[421])*5000; // y
+        //score += (feature[422] == 1) ? -5000 : 100; // isTopBlock
+        //score += (feature[423] == 1) ? -200 : 200; // Dangerous
+        score += 1000 * feature[424]; // Manhattan
+        //score += 10 * feature[425]; // Score
+        //score -= feature[427] * 200; // getAvatarHealthPoints
+
+        return score;
+    }
+
     private Instances simulate(StateObservation stateObs, StateHeuristic heuristic, QPolicy policy) {
 
         Instances data = new Instances(RLDataExtractor.datasetHeader(), 0);
@@ -79,19 +88,22 @@ public class Agent extends AbstractPlayer {
         Instance sequence[] = new Instance[SIMULATION_DEPTH];
         int depth = 0;
         double factor = 1;
-        for (; depth < SIMULATION_DEPTH; depth++) {
+        for (; depth < SIMULATION_DEPTH; depth++) {//向前看SIMULATION_DEPTH步
             try {
                 double[] features = RLDataExtractor.featureExtract(stateObs);
+                Evaluate(features);
 
                 int action_num = policy.getAction(features);
 
                 double score_before = heuristic.evaluateState(stateObs);
+                //double score_before = Evaluate(features);
 
                 // simulate
                 Types.ACTIONS action = action_mapping.get(action_num);
                 stateObs.advance(action);
 
                 double score_after = heuristic.evaluateState(stateObs);
+                //double score_after = Evaluate(features);
 
                 double delta_score = factor * (score_after - score_before);
                 factor = factor * m_gamma;
