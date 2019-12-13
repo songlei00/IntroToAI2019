@@ -63,7 +63,7 @@ public class QPolicy {
     // max Q action with epsilon-greedy 
     public int getAction(double[] feature) throws Exception{
         if(m_epsilon > final_epsilon)
-            m_epsilon -= (m_epsilon-final_epsilon)/100000;
+            m_epsilon -= (m_epsilon-final_epsilon)/10000000;
         double[] Q = getQArray(feature);
         
         // find best action according to Q value

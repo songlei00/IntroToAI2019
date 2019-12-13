@@ -33,8 +33,8 @@ public class Assignment4
         //CompetitionParameters.ACTION_TIME = 1000;
         //ArcadeMachine.runOneGame(game, level, visuals, rlController, null, seed, false);
         //String level2 = gamesPath + games[gameIdx] + "_lvl" + 1 +".txt";
-        for(int i=0; i<1; i++){
-        //for(int i=0; i<10; i++){
+        //for(int i=0; i<1; i++){
+        for(int i=0; i<10; i++){
             String levelfile = level + "0.txt";
             ArcadeMachine.runOneGame(game, levelfile, visuals, rlController, null, seed, false);
         }
