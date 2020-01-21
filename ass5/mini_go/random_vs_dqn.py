@@ -56,9 +56,9 @@ def main(unused_argv):
         # train the agent
         for ep in range(FLAGS.num_train_episodes):
             if (ep + 1) % FLAGS.save_every == 0:
-                if not os.path.exists("saved_model"):
-                    os.mkdir('saved_model')
-                agents[1].save(checkpoint_root='saved_model', checkpoint_name='random_vs_dqn_{}'.format(ep+1))
+                if not os.path.exists("saved_model/random_vs_dqn"):
+                    os.mkdir('saved_model/random_vs_dqn')
+                agents[1].save(checkpoint_root='saved_model/random_vs_dqn', checkpoint_name='random_vs_dqn_{}'.format(ep+1))
                 print('saved %d'%(ep+1))
             time_step = env.reset()  # a go.Position object
             while not time_step.last():
@@ -75,7 +75,7 @@ def main(unused_argv):
                 ret[ep % max_len] = time_step.rewards[0]
 
         # evaluated the trained agent
-        agents[1].restore("saved_model/10000")
+        agents[1].restore("saved_model/random_vs_dqn/random_vs_dqn_10000")
         ret = []
         for ep in range(FLAGS.num_eval):
             time_step = env.reset()
@@ -94,7 +94,7 @@ def main(unused_argv):
             agents[1].step(time_step, is_evaluation=True, add_transition_record=False)
             ret.append(time_step.rewards[0])
         print(np.mean(ret))
-        print(ret)
+        # print(ret)
 
     print('Time elapsed:', time.time()-begin)
 

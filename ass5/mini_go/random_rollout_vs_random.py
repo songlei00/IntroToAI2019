@@ -6,7 +6,7 @@ import tensorflow as tf
 import random
 import agent.agent as agent
 
-NUM_EPISODES = 10
+NUM_EPISODES = 200
 
 def main(unused_argv):
     begin = time.time()
@@ -32,7 +32,7 @@ def main(unused_argv):
         ret.append(time_step.rewards[0])
         print('end')
     print(np.mean(ret))
-    print(ret)
+    # print(ret)
 
     print('Time elapsed:', time.time()-begin)
 

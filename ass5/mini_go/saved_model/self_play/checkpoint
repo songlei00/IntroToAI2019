@@ -1,0 +1,6 @@
+model_checkpoint_path: "self_play_value_fn_100"
+all_model_checkpoint_paths: "self_play_value_fn_20"
+all_model_checkpoint_paths: "self_play_value_fn_40"
+all_model_checkpoint_paths: "self_play_value_fn_60"
+all_model_checkpoint_paths: "self_play_value_fn_80"
+all_model_checkpoint_paths: "self_play_value_fn_100"

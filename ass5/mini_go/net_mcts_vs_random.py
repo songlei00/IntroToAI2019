@@ -8,8 +8,8 @@ import random
 import agent.agent as agent
 
 NUM_EVAL = 10
-NUM_TRAIN = 20
-NUM_SAVE_EVERY = 10
+NUM_TRAIN = 0
+NUM_SAVE_EVERY = 50
 max_len = 100
 
 def main(unused_argv):
@@ -17,25 +17,19 @@ def main(unused_argv):
     env = Go()
     ret = [0]
 
-    # policy_function = 'saved_model/%d'%(random.randint(1, 5)*2000)
-    # value_function = 'saved_model/%d'%(random.randint(1, 5)*2000)
-
-    policy_function = 'saved_model/2000'
-    value_function = 'saved_model/4000'
-
-    policy_function = ['saved_model/self_play_policy_fn_30', 'saved_model/self_play_policy_fn_30']
-    value_function = 'saved_model/self_play_value_fn_30'
+    policy_function = ['saved_model/dqn_vs_random/10000', 'saved_model/random_vs_dqn/random_vs_dqn_10000']
+    value_function = 'saved_model/dqn_vs_random/10000'
 
     agents = [agent.Net_MCTS_Agent(value_function, policy_function, n_playout=50), 
         agent.RandomAgent(1)]
     
     for ep in range(NUM_TRAIN):
         if (ep + 1) % NUM_SAVE_EVERY == 0:
-            if not os.path.exists("saved_model"):
-                os.mkdir('saved_model')
-            agents[0].mcts._policy_fn[0].save(checkpoint_root='saved_model', checkpoint_name='_policy_fn_0_{}'.format(ep+1))
-            agents[0].mcts._policy_fn[1].save(checkpoint_root='saved_model', checkpoint_name='_policy_fn_1_{}'.format(ep+1))
-            agents[0].mcts._value_fn.save(checkpoint_root='saved_model', checkpoint_name='_value_fn_{}'.format(ep+1))
+            if not os.path.exists("saved_model/net_mcts_vs_random"):
+                os.mkdir('saved_model/net_mcts_vs_random')
+            agents[0].mcts._policy_fn[0].save(checkpoint_root='saved_model/net_mcts_vs_random', checkpoint_name='_policy_fn_0_{}'.format(ep+1))
+            agents[0].mcts._policy_fn[1].save(checkpoint_root='saved_model/net_mcts_vs_random', checkpoint_name='_policy_fn_1_{}'.format(ep+1))
+            agents[0].mcts._value_fn.save(checkpoint_root='saved_model/net_mcts_vs_random', checkpoint_name='_value_fn_{}'.format(ep+1))
 
         time_step = env.reset()  # a new env
         print('start ep: %d'%ep)
@@ -61,6 +55,7 @@ def main(unused_argv):
     # evaluated the trained mcts agent
     ret = []
     for ep in range(NUM_EVAL):
+        print('eval ep: %d'%ep)
         time_step = env.reset()
         while not time_step.last():
             player_id = time_step.observations["current_player"]

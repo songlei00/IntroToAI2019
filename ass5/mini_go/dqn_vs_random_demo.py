@@ -62,9 +62,9 @@ def main(unused_argv):
                 with open('log_{}_{}'.format(os.environ.get('BOARD_SIZE'), begin), 'a+') as log_file:
                     log_file.writelines("{}, {}\n".format(ep+1, np.mean(ret)))
             if (ep + 1) % FLAGS.save_every == 0:
-                if not os.path.exists("saved_model"):
-                    os.mkdir('saved_model')
-                agents[0].save(checkpoint_root='saved_model', checkpoint_name='{}'.format(ep+1))
+                if not os.path.exists("saved_model/dqn_vs_random"):
+                    os.mkdir('saved_model/dqn_vs_random')
+                agents[0].save(checkpoint_root='saved_model/dqn_vs_random', checkpoint_name='{}'.format(ep+1))
             time_step = env.reset()  # a go.Position object
             while not time_step.last():
                 player_id = time_step.observations["current_player"]
@@ -79,7 +79,7 @@ def main(unused_argv):
                 ret[ep % max_len] = time_step.rewards[0]
 
         # evaluated the trained agent
-        agents[0].restore("saved_model/10000")
+        agents[0].restore("saved_model/dqn_vs_random/10000")
         ret = []
         for ep in range(FLAGS.num_eval):
             time_step = env.reset()

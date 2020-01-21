@@ -131,7 +131,7 @@ class MCTS:
         env_cpy = copy.deepcopy(env)
         # use i to limit, I don't know why if I don't use i, the cycle will sometimes never end
         i = 0
-        while not time_step.last() and i<100:
+        while not time_step.last() and i<50:
             # action_probs = self._rollout_fn(time_step)
             # print(action_probs)
             cur_player = time_step.observations["current_player"]
