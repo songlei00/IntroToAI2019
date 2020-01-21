@@ -11,7 +11,7 @@ NUM_EPISODES = 10
 def main(unused_argv):
     begin = time.time()
     env = Go()
-    agents = [agent.Random_Rollout_MCTS_Agent(max_simulations=50), agent.RandomAgent(1)]
+    agents = [agent.Random_Rollout_MCTS_Agent(n_playout=100), agent.RandomAgent(1)]
     ret = []
 
     for ep in range(NUM_EPISODES):

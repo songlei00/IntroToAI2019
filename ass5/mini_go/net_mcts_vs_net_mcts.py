@@ -4,12 +4,10 @@ import time, os
 import numpy as np
 import tensorflow as tf
 import random
-
 import agent.agent as agent
-from algorithms.net_mcts import MCTSAgent
 
 NUM_EVAL = 10
-NUM_TRAIN = 30
+NUM_TRAIN = 20
 NUM_SAVE_EVERY = 10
 max_len = 100
 
@@ -21,18 +19,19 @@ def main(unused_argv):
     # policy_function = 'saved_model/%d'%(random.randint(1, 5)*2000)
     # value_function = 'saved_model/%d'%(random.randint(1, 5)*2000)
 
-    policy_function = 'saved_model/2000'
+    policy_function = ['saved_model/2000', 'saved_model/6000']
     value_function = 'saved_model/4000'
 
-    agents = [MCTSAgent(value_function, policy_function, n_playout=50), 
-        MCTSAgent(value_function, policy_function, n_playout=50)]
+    agents = [agent.Net_MCTS_Agent(value_function, policy_function, n_playout=50), 
+        agent.Net_MCTS_Agent(value_function, policy_function, n_playout=50)]
     # sess.run(tf.global_variables_initializer())
     
     for ep in range(NUM_TRAIN):
         if (ep + 1) % NUM_SAVE_EVERY == 0:
             if not os.path.exists("saved_model"):
                 os.mkdir('saved_model')
-            agents[0].mcts._policy_fn.save(checkpoint_root='saved_model', checkpoint_name='self_play_policy_fn_{}'.format(ep+1))
+            agents[0].mcts._policy_fn[0].save(checkpoint_root='saved_model', checkpoint_name='self_play_policy_fn_{}'.format(ep+1))
+            agents[0].mcts._policy_fn[1].save(checkpoint_root='saved_model', checkpoint_name='self_play_policy_fn_{}'.format(ep+1))
             agents[0].mcts._value_fn.save(checkpoint_root='saved_model', checkpoint_name='self_play_value_fn_{}'.format(ep+1))
 
         time_step = env.reset()  # a new env

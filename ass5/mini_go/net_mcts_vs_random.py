@@ -6,7 +6,6 @@ import tensorflow as tf
 import random
 
 import agent.agent as agent
-from algorithms.net_mcts import MCTSAgent
 
 NUM_EVAL = 10
 NUM_TRAIN = 20
@@ -27,14 +26,15 @@ def main(unused_argv):
     policy_function = ['saved_model/self_play_policy_fn_30', 'saved_model/self_play_policy_fn_30']
     value_function = 'saved_model/self_play_value_fn_30'
 
-    agents = [MCTSAgent(value_function, policy_function, n_playout=50), 
+    agents = [agent.Net_MCTS_Agent(value_function, policy_function, n_playout=50), 
         agent.RandomAgent(1)]
     
     for ep in range(NUM_TRAIN):
         if (ep + 1) % NUM_SAVE_EVERY == 0:
             if not os.path.exists("saved_model"):
                 os.mkdir('saved_model')
-            agents[0].mcts._policy_fn.save(checkpoint_root='saved_model', checkpoint_name='_policy_fn_{}'.format(ep+1))
+            agents[0].mcts._policy_fn[0].save(checkpoint_root='saved_model', checkpoint_name='_policy_fn_0_{}'.format(ep+1))
+            agents[0].mcts._policy_fn[1].save(checkpoint_root='saved_model', checkpoint_name='_policy_fn_1_{}'.format(ep+1))
             agents[0].mcts._value_fn.save(checkpoint_root='saved_model', checkpoint_name='_value_fn_{}'.format(ep+1))
 
         time_step = env.reset()  # a new env

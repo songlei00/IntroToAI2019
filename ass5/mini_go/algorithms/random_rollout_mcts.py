@@ -1,7 +1,6 @@
 import numpy as np 
-import collections
 import copy
-from environment.GoEnv import Go
+import collections
 import tensorflow as tf
 
 StepOutput = collections.namedtuple("step_output", ["action", "probs"])
@@ -9,88 +8,97 @@ StepOutput = collections.namedtuple("step_output", ["action", "probs"])
 # mcts is referenced from
 # https://github.com/junxiaosong/AlphaZero_Gomoku/blob/master/mcts_alphaZero.py
 class TreeNode:
-    def __init__(self, parent, prior):
-        self.parent = parent
-        self.p = prior
-        self.children = {}
-        self.n_visits = 0
-        self.Q = 0
-        self.u = 0 # ucb
-    
-    # select the best node
-    def select(self):
-        return max(self.children.items(), key=lambda node: node[1].get_value())
+    def __init__(self, parent, prior_p):
+        self._parent = parent
+        self._children = {}
+        self._n_visits = 0
+        self._Q = 0
+        self._u = 0
+        self._P = prior_p
 
     def expand(self, action_priors, time_step):
+        # print(action_priors)
         actions = action_priors[0]
         priors = action_priors[1]
         cur_player = time_step.observations["current_player"]
         sensible_moves = time_step.observations["legal_actions"][cur_player]
 
         for action, prob in zip(actions, priors):
-            if action not in self.children and action in sensible_moves and action < 25: # action is legal
-                self.children[action] = TreeNode(self, prob)
+            if action not in self._children and action in sensible_moves and action < 25: # action is legal
+                self._children[action] = TreeNode(self, prob)
+    
+    def select(self):
+        return max(self._children.items(), key=lambda node: node[1].get_value())
     
     def update(self, leaf_value):
-        self.n_visits += 1
-        self.Q += 1.0*(leaf_value - self.Q)/self.n_visits
+        self._n_visits += 1
+        self._Q += 1.0*(leaf_value - self._Q)/self._n_visits
 
-    def update_back(self, leaf_value):
-        if self.parent:
+    def update_recuesive(self, leaf_value):
+        if self._parent:
             # the parent is another player, so add the subtract
-            self.parent.update_back(-leaf_value)
+            self._parent.update_recuesive(-leaf_value)
         self.update(leaf_value)
-    
-    def get_value(self):
-        self.u = (3*self.p*np.sqrt(self.parent.n_visits)/(1+self.n_visits))
 
-        return self.Q + self.u
+    def get_value(self):
+        self._u = (self._P*np.sqrt(self._parent._n_visits)/(1+self._n_visits))
+        return self._Q + self._u
 
     def is_leaf(self):
-        return self.children == {}
+        return self._children == {}
 
     def is_root(self):
-        return self.panent is None
-
+        return self._parent is None
 
 class MCTS:
-    def __init__(self, fn, max_simulations=200):
-        self.root = TreeNode(None, 1.0)
-        self.policy = fn
-        self.max_simulations = max_simulations
+    def __init__(self, rollout_fn, n_playout=50):
+        self._root = TreeNode(None, 1.0)
+        self._rollout_fn = rollout_fn
+        self._n_playout = n_playout
 
-    def simulation(self, time_step, env):
-        node = self.root
+    def playout(self, time_step, env):
+        # copy to avoid to change original attributes
+        node = self._root
         env_cpy = copy.deepcopy(env)
 
         # reach the leaf
-        while node.is_leaf() == 0:
+        while not node.is_leaf():
             action, node = node.select()
             time_step = env_cpy.step(action)
-        # random rollout until the game is over
-        action_probs = self.policy(time_step)
-        # print(action_probs)
+
+        # expand
+        action_probs = self._rollout_fn(time_step)
         time_step = env_cpy.step(action_probs[0][np.argmax(action_probs[1])])
-
-        end = time_step.last()
-        leaf_value = 0.0
+        node.expand(action_probs, time_step)
         
-        if not end:
-            # print(action_probs)
-            node.expand(action_probs, time_step)
-        else:
-            cur_player = time_step.observations["current_player"]
-            leaf_value = -time_step.rewards[cur_player]
+        # use random rollout to evaluate the node
+        leaf_value = self.rollout(time_step, env_cpy)
 
-        node.update_back(-leaf_value)
+        node.update_recuesive(leaf_value)
+
+    def rollout(self, time_step, env):
+        env_cpy = copy.deepcopy(env)
+        while not time_step.last():
+            action_probs = self._rollout_fn(time_step)
+            # print(action_probs)
+            # cur_player = time_step.observations["current_player"]
+            # sensible_moves = time_step.observations["legal_actions"][cur_player]
+            # print(sensible_moves)
+            best_action = action_probs[0][np.argmax(action_probs[1])]
+            # print(best_action)
+            time_step = env_cpy.step(best_action)
+        
+        return time_step.rewards[0]
 
     def get_move_probs(self, time_step, env, tmp=1e-3):
-        # rollout 
-        for i in range(self.max_simulations):
-            self.simulation(time_step, env)
-        
-        act_visits = [(act, node.n_visits) for act, node in self.root.children.items()]
+        for _ in range(self._n_playout):
+            env_cpy = copy.deepcopy(env)
+            self.playout(time_step, env_cpy)
+            
+        act_visits = [(act, node._n_visits) for act, node in self._root._children.items()]
+        # print(act_visits)
         if act_visits == []:
+            # print("finish")
             return
 
         acts, visits = zip(*act_visits)
@@ -100,14 +108,13 @@ class MCTS:
         return acts, act_probs
 
     def update_with_move(self, last_move):
-        if last_move in self.root.children:
-            self.root = self.root.children[last_move]
-            self.root.parent = None
+        if last_move in self._root._children:
+            self._root = self._root._children[last_move]
+            self._root._parent = None
         else:
-            self.root = TreeNode(None, 1.0)
+            self._root = TreeNode(None, 1.0)
 
     def softmax(self, x):
         probs = np.exp(x - np.max(x))
         probs /= np.sum(probs)
         return probs
-    
