@@ -7,9 +7,9 @@ import tensorflow as tf
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("num_train_episodes", 10000,
+flags.DEFINE_integer("num_train_episodes", 10,
                      "Number of training episodes for each base policy.")
-flags.DEFINE_integer("num_eval", 1000,
+flags.DEFINE_integer("num_eval", 100,
                      "Number of evaluation episodes")
 flags.DEFINE_integer("eval_every", 2000,
                      "Episode frequency at which the agents are evaluated.")
@@ -48,10 +48,8 @@ def main(unused_argv):
     max_len = 2000
 
     with tf.Session() as sess:
-        # agents = [DQN(sess, _idx, info_state_size,
-        #                   num_actions, hidden_layers_sizes, **kwargs) for _idx in range(2)]  # for self play
         agents = [DQN(sess, 0, info_state_size,
-                          num_actions, hidden_layers_sizes, **kwargs), agent.RandomAgent(1)]
+            num_actions, hidden_layers_sizes, **kwargs), agent.Random_Rollout_MCTS_Agent(max_simulations=50)]
         sess.run(tf.global_variables_initializer())
 
         # train the agent
@@ -59,7 +57,7 @@ def main(unused_argv):
             if (ep + 1) % FLAGS.eval_every == 0:
                 losses = agents[0].loss
                 logging.info("Episodes: {}: Losses: {}, Rewards: {}".format(ep + 1, losses, np.mean(ret)))
-                with open('log_{}_{}'.format(os.environ.get('BOARD_SIZE'), begin), 'a+') as log_file:
+                with open('log/log_{}_{}'.format(os.environ.get('BOARD_SIZE'), begin), 'a+') as log_file:
                     log_file.writelines("{}, {}\n".format(ep+1, np.mean(ret)))
             if (ep + 1) % FLAGS.save_every == 0:
                 if not os.path.exists("saved_model"):
@@ -68,11 +66,15 @@ def main(unused_argv):
             time_step = env.reset()  # a go.Position object
             while not time_step.last():
                 player_id = time_step.observations["current_player"]
-                agent_output = agents[player_id].step(time_step)
+                if player_id == 0:
+                    agent_output = agents[player_id].step(time_step)
+                else:
+                    agent_output = agents[player_id].step(time_step, env)
                 action_list = agent_output.action
                 time_step = env.step(action_list)
-            for agent in agents:
-                agent.step(time_step)
+            # for agent in agents:
+            agents[0].step(time_step)
+            agents[1].step(time_step, env)
             if len(ret) < max_len:
                 ret.append(time_step.rewards[0])
             else:
@@ -88,14 +90,14 @@ def main(unused_argv):
                 if player_id == 0:
                     agent_output = agents[player_id].step(time_step, is_evaluation=True, add_transition_record=False)
                 else:
-                    agent_output = agents[player_id].step(time_step)
+                    agent_output = agents[player_id].step(time_step, env)
                 action_list = agent_output.action
                 time_step = env.step(action_list)
 
             # Episode is over, step all agents with final info state.
             # for agent in agents:
             agents[0].step(time_step, is_evaluation=True, add_transition_record=False)
-            agents[1].step(time_step)
+            agents[1].step(time_step, env)
             ret.append(time_step.rewards[0])
         print(np.mean(ret))
 

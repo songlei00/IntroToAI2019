@@ -7,7 +7,7 @@ import numpy as np
 
 class TimeStep(
     collections.namedtuple(
-        "TimeStep", ["observations", "rewards", "discounts", "step_type"])): # 命名数组
+        "TimeStep", ["observations", "rewards", "discounts", "step_type"])):
     """Returned with every call to `step` and `reset`.
 
     A `TimeStep` contains the data emitted by a game at each step of interaction.
@@ -29,7 +29,7 @@ class TimeStep(
     __slots__ = ()
 
     def first(self):
-        return self.step_type == StepType.FIRST # 这个是在下面定义的枚举类型
+        return self.step_type == StepType.FIRST
 
     def mid(self):
         return self.step_type == StepType.MID
@@ -41,7 +41,7 @@ class TimeStep(
         return self.observations["current_player"]
 
 
-class StepType(enum.Enum): # 对枚举类继承
+class StepType(enum.Enum):
     """Defines the status of a `TimeStep` within a sequence."""
 
     FIRST = 0  # Denotes the first `TimeStep` in a sequence.
@@ -60,10 +60,10 @@ class StepType(enum.Enum): # 对枚举类继承
 
 class Go(object):
     def __init__(self, flatten_board_state=True, discount_factor=1.0):
-        self.__state = go.Position(komi=0.5) # komi表示让子的数量，根据readme，让半个子给白棋
-        self.__flatten_state = flatten_board_state # 这个用来表示返回的棋盘是二维还是一维
+        self.__state = go.Position(komi=0.5)
+        self.__flatten_state = flatten_board_state
         self.__discount_factor = discount_factor
-        N = int(os.environ.get("BOARD_SIZE")) # 棋盘大小
+        N = int(os.environ.get("BOARD_SIZE"))
         self.__state_size = N ** 2
         self.__action_size = self.__state_size + 1  # board size and an extra action for "pass"
         self.__num_players = 2

@@ -50,26 +50,22 @@ def main(unused_argv):
     with tf.Session() as sess:
         # agents = [DQN(sess, _idx, info_state_size,
         #                   num_actions, hidden_layers_sizes, **kwargs) for _idx in range(2)]  # for self play
-        agents = [DQN(sess, 0, info_state_size,
-                          num_actions, hidden_layers_sizes, **kwargs), agent.RandomAgent(1)]
+        agents = [agent.RandomAgent(1),
+                DQN(sess, 1, info_state_size, num_actions, hidden_layers_sizes, **kwargs)]
         sess.run(tf.global_variables_initializer())
-
         # train the agent
         for ep in range(FLAGS.num_train_episodes):
-            if (ep + 1) % FLAGS.eval_every == 0:
-                losses = agents[0].loss
-                logging.info("Episodes: {}: Losses: {}, Rewards: {}".format(ep + 1, losses, np.mean(ret)))
-                with open('log_{}_{}'.format(os.environ.get('BOARD_SIZE'), begin), 'a+') as log_file:
-                    log_file.writelines("{}, {}\n".format(ep+1, np.mean(ret)))
             if (ep + 1) % FLAGS.save_every == 0:
                 if not os.path.exists("saved_model"):
                     os.mkdir('saved_model')
-                agents[0].save(checkpoint_root='saved_model', checkpoint_name='{}'.format(ep+1))
+                agents[1].save(checkpoint_root='saved_model', checkpoint_name='random_vs_dqn_{}'.format(ep+1))
+                print('saved %d'%(ep+1))
             time_step = env.reset()  # a go.Position object
             while not time_step.last():
                 player_id = time_step.observations["current_player"]
                 agent_output = agents[player_id].step(time_step)
                 action_list = agent_output.action
+                # print(action_list)
                 time_step = env.step(action_list)
             for agent in agents:
                 agent.step(time_step)
@@ -79,25 +75,26 @@ def main(unused_argv):
                 ret[ep % max_len] = time_step.rewards[0]
 
         # evaluated the trained agent
-        agents[0].restore("saved_model/10000")
+        agents[1].restore("saved_model/10000")
         ret = []
         for ep in range(FLAGS.num_eval):
             time_step = env.reset()
             while not time_step.last():
                 player_id = time_step.observations["current_player"]
                 if player_id == 0:
-                    agent_output = agents[player_id].step(time_step, is_evaluation=True, add_transition_record=False)
-                else:
                     agent_output = agents[player_id].step(time_step)
+                else:
+                    agent_output = agents[player_id].step(time_step, is_evaluation=True, add_transition_record=False)
                 action_list = agent_output.action
                 time_step = env.step(action_list)
 
             # Episode is over, step all agents with final info state.
             # for agent in agents:
-            agents[0].step(time_step, is_evaluation=True, add_transition_record=False)
-            agents[1].step(time_step)
+            agents[0].step(time_step)
+            agents[1].step(time_step, is_evaluation=True, add_transition_record=False)
             ret.append(time_step.rewards[0])
         print(np.mean(ret))
+        print(ret)
 
     print('Time elapsed:', time.time()-begin)
 
